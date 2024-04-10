@@ -1,0 +1,12 @@
+{
+    "routes": [
+        {
+            "src": "/",
+            "dest": "/"
+        },
+        {
+            "src": "/",
+            "dest": "/api/auth/all-users"
+        }
+    ]
+}
