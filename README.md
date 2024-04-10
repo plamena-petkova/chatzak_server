@@ -1,10 +1,8 @@
 # Chatzak Chat Application 
-Chatzak is a Full Stack Chatting App.
+Chatzak Server API
 It uses Socket.io for real time communication and stores users details and messages in Mongo DB Database.
 
 ## Tech Stack
-
-**Client:** React JS
 
 **Server:** Node JS, Express JS
 
@@ -12,7 +10,7 @@ It uses Socket.io for real time communication and stores users details and messa
 
 ## Demo
 Deployed on Render.com at this URL:
-https://chatzak.onrender.com/
+https://chatzak-server.onrender.com/
 
 ## Features
 
@@ -32,23 +30,22 @@ https://chatzak.onrender.com/
 ## Run Locally
 
 - clone github repo
-git clone https://github.com/plamena-petkova/chatzak_be
+git clone https://github.com/plamena-petkova/chatzak_server
 
 - install dependencies
-npm install
-
-- go to backend folder and start the server
-cd backend 
-node backend/src/index.js
-
-- open new terminal and go to frontend folder 
-cd frontend
-
-- install the dependencies
 npm install
 
 - start the client
 npm run start
 
-- reach the app on http://localhost:3000
+- reach the app on http://localhost:5000
+
+## Client Github Repo
+
+https://github.com/plamena-petkova/chatzak
+
+## Client deployed on Netlify
+
+https://chatzak.netlify.app/
+
 
