@@ -127,3 +127,36 @@ module.exports.getUserById = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.editUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const { username, names, email } = req.body;
+
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "User not found", status: false });
+      }
+
+      if (username) {
+        user.username = username;
+      }
+      if (email) {
+        user.email = email;
+      }
+      if (names) {
+        user.names = names;
+      }
+
+      await user.save();
+
+      return res.json({ message: "User info updated", status: true, user });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
