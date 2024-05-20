@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const Message = require("../models/messageModel");
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -155,6 +156,37 @@ module.exports.editUserById = async (req, res, next) => {
       await user.save();
 
       return res.json({ message: "User info updated", status: true, user });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.deleteUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId);
+
+      const from = userId;
+      const to = userId;
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "User not found", status: false });
+      }
+
+      await Message.deleteMany({
+        users: {
+          $all: [from, to],
+        },
+      });
+
+      await user.deleteOne();
+
+      return res.json({ message: "User account deleted!", status: true });
     }
   } catch (err) {
     next(err);
