@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const Message = require("../models/messageModel");
+const { createSession } = require("../utils/token");
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -30,7 +31,10 @@ module.exports.register = async (req, res, next) => {
       password: hashedPassword,
     });
     delete user.password;
-    return res.json({ status: true, user });
+
+    const sessionUser = createSession(user);
+
+    return res.json({ status: true, sessionUser });
   } catch (err) {
     next(err);
   }
@@ -58,7 +62,9 @@ module.exports.login = async (req, res, next) => {
 
     delete user.password;
 
-    return res.json({ status: true, user });
+    const sessionUser = createSession(user);
+
+    return res.json({ status: true, sessionUser });
   } catch (err) {
     next(err);
   }
