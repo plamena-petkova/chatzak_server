@@ -79,42 +79,31 @@ module.exports.getAllMessages = async (req, res, next) => {
 
 module.exports.getLastMessage = async (req, res, next) => {
   try {
-    //const { from, to } = req.body;
-    const { userId } = req.body;
-    /*
-    const messages = await Message.find({
-      users: {
-        $all: [from, to],
-      },
-    });
-*/
+    const userId = req.body.userId;
+    
     const users = await User.find({});
 
-    const usersArr = [];
+    const lastMessagePerUser = new Map();
 
-    const userObjectLastMessage = {};
+    await Promise.all(users.map(async user => {
+      const messages = await Message.find({
+        users: {
+          $all: [userId, user._id.toString()],
+        },
+      });
 
-    users.forEach(async (user) => {
-      console.log("UserId", user._id.toString());
-
-      try {
-        const lastMessageUser = await Message.find({
-          users: {
-            $all: [userId, user._id.toString()],
-          },
-        });
-
-        const lastMsg = lastMessageUser.slice(-1).pop();
-
-        userObjectLastMessage.userId = user._id;
-        userObjectLastMessage.lastMessage = lastMsg.message;
-
-        usersArr.push(userObjectLastMessage);
-        res.json(usersArr);
-      } catch (e) {
-        console.log("Error", e);
+      if (messages && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage) {
+          lastMessagePerUser.set(user._id.toString(), lastMessage);
+          lastMessagePerUser.delete(userId);
+        }
       }
-    });
+    }));
+
+   
+    res.json(Object.fromEntries(lastMessagePerUser));  
+
   } catch (err) {
     console.error(err);
     next(err);
