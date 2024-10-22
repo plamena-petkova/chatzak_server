@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const Message = require("../models/messageModel");
 const { createSession } = require("../utils/token");
+const sgMail = require("@sendgrid/mail");
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -195,6 +196,32 @@ module.exports.deleteUserById = async (req, res, next) => {
       return res.json({ message: "User account deleted!", status: true });
     }
   } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.sendInvitation = async (req, res, next) => {
+  try {
+    const { email, messageEmail, senderMail } = req.body;
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: email, // Change to your recipient
+      from: senderMail, // Change to your verified sender
+      subject: "Invitation to join Chatzak chat app",
+      text: messageEmail,
+      html: `<strong>${messageEmail}</strong>`,
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  } catch (err) {
+    console.error(err);
     next(err);
   }
 };
