@@ -73,13 +73,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({}).select([
-      "email",
-      "username",
-      "avatarImg",
-      "_id",
-      "names",
-    ]);
+    const users = await User.find({});
     res.json({ status: true, users });
 
     if (!users) {
@@ -176,6 +170,7 @@ module.exports.blockUserById = async (req, res, next) => {
 
     if (mongoose.Types.ObjectId.isValid(userId)) {
       const user = await User.findById(userId);
+      const blocked = await User.findById(blockedUser)
 
       if (!user) {
         return res
@@ -189,8 +184,52 @@ module.exports.blockUserById = async (req, res, next) => {
         return;
       } else {
         user.blockedUsers.push(blockedUser);
+        blocked.isBlockedFrom.push((user._id).toString());
+
       }
 
+      await user.save();
+      await blocked.save();
+
+      return res.json({ message: "User info updated", status: true, user });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.unblockUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const { blockedUser } = req.body;
+
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId);
+      const blocked = await User.findById(blockedUser._id);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "User not found", status: false });
+      }
+      if (!user.blockedUsers.includes(blockedUser)) {
+        res
+          .status(409)
+          .json({ message: "User was already unblocked", status: false });
+        return;
+      } else {
+        const indexIdToUnblock = user.blockedUsers.indexOf(blockedUser);
+
+        if (indexIdToUnblock !== -1) {
+          user.blockedUsers.splice(indexIdToUnblock, 1);
+        }
+
+        const indexOfBlocked = blocked.isBlockedFrom.indexOf(user._id);
+
+        if (indexOfBlocked !== -1) {
+          blocked.isBlockedFrom.splice(indexOfBlocked, 1);
+        }
+      }
       await user.save();
 
       return res.json({ message: "User info updated", status: true, user });
