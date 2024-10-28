@@ -205,7 +205,8 @@ module.exports.unblockUserById = async (req, res, next) => {
 
     if (mongoose.Types.ObjectId.isValid(userId)) {
       const user = await User.findById(userId);
-      const blocked = await User.findById(blockedUser._id);
+
+      const blocked = await User.findById(blockedUser);
 
       if (!user) {
         return res
@@ -225,6 +226,7 @@ module.exports.unblockUserById = async (req, res, next) => {
         }
 
         const indexOfBlocked = blocked.isBlockedFrom.indexOf(user._id);
+
 
         if (indexOfBlocked !== -1) {
           blocked.isBlockedFrom.splice(indexOfBlocked, 1);
