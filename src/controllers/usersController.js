@@ -170,7 +170,6 @@ module.exports.blockUserById = async (req, res, next) => {
 
     if (mongoose.Types.ObjectId.isValid(userId)) {
       const user = await User.findById(userId);
-      const blocked = await User.findById(blockedUser)
 
       if (!user) {
         return res
@@ -182,14 +181,10 @@ module.exports.blockUserById = async (req, res, next) => {
           .status(409)
           .json({ message: "User was already blocked", status: false });
         return;
-      } else {
-        user.blockedUsers.push(blockedUser);
-        blocked.isBlockedFrom.push((user._id).toString());
-
       }
 
+      user.blockedUsers.push(blockedUser);
       await user.save();
-      await blocked.save();
 
       return res.json({ message: "User info updated", status: true, user });
     }
@@ -206,32 +201,17 @@ module.exports.unblockUserById = async (req, res, next) => {
     if (mongoose.Types.ObjectId.isValid(userId)) {
       const user = await User.findById(userId);
 
-      const blocked = await User.findById(blockedUser);
-
       if (!user) {
         return res
           .status(404)
           .json({ message: "User not found", status: false });
       }
-      if (!user.blockedUsers.includes(blockedUser)) {
-        res
-          .status(409)
-          .json({ message: "User was already unblocked", status: false });
-        return;
-      } else {
-        const indexIdToUnblock = user.blockedUsers.indexOf(blockedUser);
+      const indexIdToUnblock = user.blockedUsers.indexOf(blockedUser);
 
-        if (indexIdToUnblock !== -1) {
-          user.blockedUsers.splice(indexIdToUnblock, 1);
-        }
-
-        const indexOfBlocked = blocked.isBlockedFrom.indexOf(user._id);
-
-
-        if (indexOfBlocked !== -1) {
-          blocked.isBlockedFrom.splice(indexOfBlocked, 1);
-        }
+      if (indexIdToUnblock !== -1) {
+        user.blockedUsers.splice(indexIdToUnblock, 1);
       }
+
       await user.save();
 
       return res.json({ message: "User info updated", status: true, user });

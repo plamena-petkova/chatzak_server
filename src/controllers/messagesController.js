@@ -4,11 +4,28 @@ const User = require("../models/userModel");
 module.exports.addMessage = async (req, res, next) => {
   try {
     const { from, to, message } = req.body;
+
+    console.log('From', from, to)
+
+    const sender = await User.findById(from);
+    const receiver = await User.findById(to);
+
+    if (!sender || !receiver) {
+      return res.status(404).json({ message: "User not found", status: false });
+    }
+
+    // Check if either user has blocked the other
+    if (sender.blockedUsers.includes(to) || receiver.blockedUsers.includes(from)) {
+      return res.status(403).json({ message: "Action not allowed - user is blocked", status: false });
+    }
+
     const data = await Message.create({
       message: { text: message },
       users: [from, to],
       sender: from,
     });
+
+
     if (data) {
       return res.json({ msg: "Message adedd successfully" });
     } else {
