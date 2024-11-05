@@ -47,17 +47,25 @@ const io = socket(server, {
 const onlineUsers = new Map();
 const users = new Map();
 
-io.on("connection", (socket) => {
+io.on("connect", (socket) => {
   socket.on("add-user", (newUserId) => {
-    onlineUsers.set(newUserId, socket.id);
-    users.set(socket.id, newUserId);
-    io.emit("update-users", Object.fromEntries(users));
+    if(socket.id && newUserId) {
+      onlineUsers.set(newUserId, socket.id);
+      users.set(socket.id, newUserId);
+      io.emit("update-users", Object.fromEntries(users));
+    }
+    
   });
 
   socket.on("disconnect", () => {
-    users.delete(socket.id);
-    io.emit("update-users", Object.fromEntries(users));
+    const userId = users.get(socket.id);
+    if (userId) {
+      onlineUsers.delete(userId);
+      users.delete(socket.id);
+      io.emit("update-users", Object.fromEntries(users));
+    }
   });
+  
 
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
@@ -70,6 +78,20 @@ io.on("connection", (socket) => {
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-edited", data.message);
     }
+  });
+  socket.on('block-user', (data) => {
+    const sendUserSocket = onlineUsers.get(data.blockedUser._id);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit('user-blocked', data);
+    }
+   
+  });
+  socket.on('unblock-user', (data) => {
+    const sendUserSocket = onlineUsers.get(data.blockedUser._id);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit('user-unblocked', data);
+    }
+   
   });
 });
 

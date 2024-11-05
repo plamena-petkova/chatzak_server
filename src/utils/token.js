@@ -10,6 +10,7 @@ function createSession (user) {
         email:user.email,
         _id:user._id,
         avatarImg:user.avatarImg,
+        blockedUsers: user.blockedUsers,
         accessToken: jwt.sign({
             email: user.email,
             _id:user._id
