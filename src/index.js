@@ -91,6 +91,13 @@ io.on("connect", (socket) => {
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit('user-unblocked', data);
     }
+  });
+
+  socket.on('call-user', (data) => {
+    const sendUserSocket = onlineUsers.get(data.to._id);
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit('call-received', data);
+    }
    
   });
 });
