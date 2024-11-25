@@ -277,3 +277,20 @@ module.exports.sendInvitation = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.refreshToken = async (req, res, next) => {
+  const { jitsiAccesToken } = req.body;
+
+  const appId = "vpaas-magic-cookie-4d8a089a85214104aca4d08d55dfca18";
+  // Validate current token here (optional)
+
+  const newToken = generateJWTJitsi(process.env.JITSI_PRIVATE_KEY, {
+      id: uuid(),
+      name: req.body.name, // Pass user details from the client
+      email: req.body.email,
+      avatar: req.body.avatar,
+      appId: appId,
+  });
+
+  res.json({ accessToken: newToken });
+};

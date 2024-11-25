@@ -5,8 +5,6 @@ module.exports.addMessage = async (req, res, next) => {
   try {
     const { from, to, message } = req.body;
 
-    console.log('From', from, to)
-
     const sender = await User.findById(from);
     const receiver = await User.findById(to);
 

@@ -1,4 +1,4 @@
-const { register, login, getAllUsers, updateAvatar, getUserById, editUserById, deleteUserById, sendInvitation, blockUserById, unblockUserById } = require("../controllers/usersController");
+const { register, login, getAllUsers, updateAvatar, getUserById, editUserById, deleteUserById, sendInvitation, blockUserById, unblockUserById, refreshToken } = require("../controllers/usersController");
 
 
 const router = require("express").Router();
@@ -13,6 +13,7 @@ router.put("/users/block/:userId", blockUserById);
 router.put("/users/unblock/:userId", unblockUserById);
 router.delete("/users/delete/:userId", deleteUserById);
 router.post("/send-invitation", sendInvitation);
+router.post("/refresh-token", refreshToken);
 
 module.exports = router;
  

@@ -4,17 +4,6 @@ const blacklist = [];
 function createSession(user) {
   const token = generateJWTJitsi(process.env.JITSI_PRIVATE_KEY, user);
 
-  /*  
-  const token = generateJWTJitsi('my private key', {
-    id: uuid(),
-    name: "my user name",
-    email: "my user email",
-    avatar: "my avatar url",
-    appId: "my AppID", // Your AppID ( previously tenant )
-    kid: "vpaas-magic-cookie-4d8a089a85214104aca4d08d55dfca18/9948a3"
-});
-*/
-
   return {
     names: user.names,
     username: user.username,
@@ -76,6 +65,7 @@ const generateJWTJitsi = (privateKey, user) => {
       room: "*",
       sub: appId,
       exp: Math.round(now.setHours(now.getHours() + 3) / 1000),
+      //exp:Math.round((now.getTime() + 10 * 60 * 1000) / 1000),
       nbf: Math.round(new Date().getTime() / 1000) - 10,
     },
     privateKey,
