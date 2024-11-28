@@ -2,9 +2,8 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const Message = require("../models/messageModel");
-const { createSession } = require("../utils/token");
+const { createSession, generateJWTJitsi } = require("../utils/token");
 const sgMail = require("@sendgrid/mail");
-const generateJWTJitsi = require("../utils/token")
 
 module.exports.register = async (req, res, next) => {
   try {
