@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const blacklist = [];
 
-function generateJWTJitsi(privateKey, user) {
+export function generateJWTJitsi(privateKey, user) {
   const { _id, names, email, avatarImg } = user;
   const appId = "vpaas-magic-cookie-4d8a089a85214104aca4d08d55dfca18";
   const kid = process.env.JITSI_KID;
