@@ -1,6 +1,42 @@
 const jwt = require("jsonwebtoken");
 const blacklist = [];
 
+function generateJWTJitsi(privateKey, user) {
+  const { _id, names, email, avatarImg } = user;
+  const appId = "vpaas-magic-cookie-4d8a089a85214104aca4d08d55dfca18";
+  const kid = process.env.JITSI_KID;
+  const now = new Date();
+  const jwtoken = jwt.sign(
+    {
+      aud: "jitsi",
+      context: {
+        user: {
+          _id,
+          names,
+          avatarImg,
+          email: email,
+          moderator: "false",
+        },
+        features: {
+          livestreaming: "true",
+          recording: "true",
+          transcription: "true",
+          "outbound-call": "true",
+        },
+      },
+      iss: "chat",
+      room: "*",
+      sub: appId,
+      exp: Math.round(now.setHours(now.getHours() + 3) / 1000),
+      //exp:Math.round((now.getTime() + 10 * 60 * 1000) / 1000),
+      nbf: Math.round(new Date().getTime() / 1000) - 10,
+    },
+    privateKey,
+    { algorithm: "RS256", header: { kid } }
+  );
+  return jwtoken;
+};
+
 function createSession(user) {
   const token = generateJWTJitsi(process.env.JITSI_PRIVATE_KEY, user);
 
@@ -37,42 +73,6 @@ function verifySession(token) {
     token,
   };
 }
-
-const generateJWTJitsi = (privateKey, user) => {
-  const { _id, names, email, avatarImg } = user;
-  const appId = "vpaas-magic-cookie-4d8a089a85214104aca4d08d55dfca18";
-  const kid = process.env.JITSI_KID;
-  const now = new Date();
-  const jwtoken = jwt.sign(
-    {
-      aud: "jitsi",
-      context: {
-        user: {
-          _id,
-          names,
-          avatarImg,
-          email: email,
-          moderator: "false",
-        },
-        features: {
-          livestreaming: "true",
-          recording: "true",
-          transcription: "true",
-          "outbound-call": "true",
-        },
-      },
-      iss: "chat",
-      room: "*",
-      sub: appId,
-      exp: Math.round(now.setHours(now.getHours() + 3) / 1000),
-      //exp:Math.round((now.getTime() + 10 * 60 * 1000) / 1000),
-      nbf: Math.round(new Date().getTime() / 1000) - 10,
-    },
-    privateKey,
-    { algorithm: "RS256", header: { kid } }
-  );
-  return jwtoken;
-};
 
 module.exports = {
   createSession,
