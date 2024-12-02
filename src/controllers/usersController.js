@@ -4,6 +4,9 @@ const mongoose = require("mongoose");
 const Message = require("../models/messageModel");
 const { createSession, generateJWTJitsi } = require("../utils/token");
 const sgMail = require("@sendgrid/mail");
+const {uuid} = require('uuid-random')
+
+
 
 module.exports.register = async (req, res, next) => {
   try {
@@ -292,5 +295,5 @@ module.exports.refreshToken = async (req, res, next) => {
       appId: appId,
   });
 
-  res.json({ accessToken: newToken });
+  res.json({ jitsiAccessToken: newToken });
 };
